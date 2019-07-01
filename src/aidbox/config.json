@@ -1,0 +1,4 @@
+{
+  "url": "http://localhost:8080/fhir/",
+  "authorization": "Basic cm9vdDpzZWNyZXQ="
+}
