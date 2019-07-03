@@ -1,5 +1,7 @@
 import * as React from 'react';
-import {IPerson} from '../aidbox/api';
+import {Row, Col} from 'antd';
+import {IPerson} from "../main/Person";
+
 
 export interface IPersonProps extends IPerson{
 
@@ -8,13 +10,14 @@ export interface IPersonProps extends IPerson{
 export class Person extends React.Component<IPersonProps,{}>{
     render(){
         return(
-            <div>
-                <div><p>{this.props.firstName}</p></div>
-                <div><p>{this.props.lastName}</p></div>
-                <div><p>{this.props.middleName}</p></div>
-                <div><p>{this.props.gender}</p></div>
-                <div><p>{this.props.birthDate.toDateString()}</p></div>
-            </div>
+
+            <Row gutter={8}>
+                <Col span={4}><p>{this.props.firstName}</p></Col>
+                <Col span={5}><p>{this.props.lastName}</p></Col>
+                <Col span={5}><p>{this.props.middleName}</p></Col>
+                <Col span={5}><p>{this.props.gender}</p></Col>
+                <Col span={5}><p>{this.props.birthDate.toDateString()}</p></Col>
+            </Row>
         )
     }
 }

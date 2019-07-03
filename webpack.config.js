@@ -19,7 +19,8 @@ module.exports = {
 
     devServer: {
         contentBase: './',
-        index: path.resolve(__dirname, './index.html')
+        index: '/index.html',
+        port: 8081
 
     },
     plugins: [
@@ -54,7 +55,7 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                exclude: /node_modules/,
+                //exclude: /node_modules/,
                 use: ['style-loader', 'css-loader']
             },
             {

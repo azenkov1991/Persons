@@ -1,4 +1,5 @@
 import config from './config.json';
+import {IPerson, Gender} from "../main/Person";
 
 interface IHL7Address{
     city: string;
@@ -25,29 +26,12 @@ interface IHL7PatientAnswer{
     resource: IHL7Resource;
 }
 
-interface IHL7Person{
-    fullUrl: string;
-
-}
-
-type Gender = "male" | "female" | "other" | "unknown";
-
-export interface IPerson {
-     firstName: string;
-     lastName: string;
-     middleName:string;
-     birthDate: Date;
-     address: string;
-     id: string;
-     gender: Gender;
- }
 
 function IHL7ResourceToPerson(resource:IHL7Resource):IPerson{
-    console.log(resource);
     return{
         firstName: resource.name[0].given[0],
-        lastName: resource.name[0].given[1]?resource.name[0].given[1]:'',
-        middleName: resource.name[0].family,
+        lastName: resource.name[0].family,
+        middleName: resource.name[0].given[1]?resource.name[0].given[1]:'',
         birthDate: new Date(resource.birthDate),
         address: resource.address[0].line[0],
         id: resource.id,
@@ -55,7 +39,20 @@ function IHL7ResourceToPerson(resource:IHL7Resource):IPerson{
     };
 }
 
-export let Patients = fetch(config.url + 'Patient/',
+// function PersonToIHL7Resource(patient:IPerson){
+//     let name:IHL7Name ={
+//         family: patient.lastName,
+//         given: [patient.firstName,],
+//
+//     };
+//     return{
+//         name[
+//             given[]
+//         ]
+//     }
+// }
+
+export let Patients = () => fetch(config.url + 'Patient/',
     {
         method: 'GET',
         headers: {
@@ -77,5 +74,24 @@ export let Patients = fetch(config.url + 'Patient/',
         );
     }
 );
+export let Patient = (id:string) => fetch(config.url + 'Patient/' + id,
+    {
 
+        method: 'GET',
+        headers: { 'Authorization': config.authorization,},
+    }
+).then(response=> {
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+        return response.json().then(
+            (data) => {
+                console.log('here is ok');
+                console.log(data);
+                return IHL7ResourceToPerson(data);
+            }
+        );
+    }
+
+);
 
