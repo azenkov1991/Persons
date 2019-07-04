@@ -1,6 +1,7 @@
+import {Moment} from 'moment';
 import * as React from 'react';
 import {Link} from 'react-router-dom';
-import {Table,Icon} from 'antd';
+import {Table, Icon, Button} from 'antd';
 import 'antd/dist/antd.css';
 import {IPerson} from '../main/Person'
 import {Patients} from "../aidbox/api";
@@ -10,32 +11,31 @@ interface IPersonsListState {
     persons: IPerson[];
     errorHasOccured: boolean;
     errorMessage: string;
-
 }
 
 const columns =[
-    {
-        title: 'FullName',
-        key: 'FullName',
-        dataIndex: 'firstName',
-        render: (data:string, row:IPerson) => (row.firstName + ' ' + row.middleName + ' ' +row.lastName)
-    },
     // {
-    //     title: 'FirstName',
+    //     title: 'FullName',
+    //     key: 'FullName',
     //     dataIndex: 'firstName',
-    //     key:'FirstName',
-    //
+    //     render: (data:string, row:IPerson) => (row.firstName + ' ' + row.middleName + ' ' +row.lastName)
     // },
-    // {
-    //     title: 'MiddleName',
-    //     dataIndex: 'middleName',
-    //     key: 'middleName'
-    // },
-    // {
-    //     title: 'LastName',
-    //     dataIndex: 'lastName',
-    //     key: 'lastName'
-    // },
+    {
+        title: 'FirstName',
+        dataIndex: 'firstName',
+        key:'FirstName',
+
+    },
+    {
+        title: 'MiddleName',
+        dataIndex: 'middleName',
+        key: 'middleName'
+    },
+    {
+        title: 'LastName',
+        dataIndex: 'lastName',
+        key: 'lastName'
+    },
     {
         title: 'Gender',
         dataIndex: 'gender',
@@ -46,7 +46,7 @@ const columns =[
         title: 'BirthDate',
         key: 'BirthDate',
         dataIndex: 'birthDate',
-        render: (birthDate:Date) => birthDate.toDateString()
+        render: (birthDate:Moment) => birthDate.format('YYYY-MM-DD')
     },
     {
         title: 'Edit',
@@ -66,8 +66,6 @@ export class PersonsTable extends React.Component<{},IPersonsListState>{
         errorMessage: ''
     };
     async componentDidMount(){
-        console.log('Person list did mount');
-
         try {
             const persons = await Patients();
             this.setState({persons: persons});
@@ -86,7 +84,12 @@ export class PersonsTable extends React.Component<{},IPersonsListState>{
         return (
             this.state.persons.length === 0 ?
                 <Icon type="loading" style={{fontSize: 50}}/> :
-                <Table rowKey= {'id'} columns={columns} dataSource={this.state.persons}/>
+                <React.Fragment>
+                    <Table rowKey= {'id'} columns={columns} dataSource={this.state.persons}/>,
+                    <Link to={"/person/new"}>
+                        <Button type={"primary"}>Add new person</Button>
+                    </Link>
+                </React.Fragment>
         )
     }
 }

@@ -8,16 +8,17 @@ interface params{
 }
 
 export class PersonEditPage extends Component<RouteChildrenProps,{}>{
+    afterEditAction =  () =>{
+        this.props.history.push('/');
+    };
     render(){
-        console.log(this.props);
-
         return (
             <div>
                 <Button type="primary" onClick={()=>this.props.history.goBack()}>
                     <Icon type="left" />
                     Go back
                 </Button>
-                <PersonEditForm id={(this.props.match.params as params).id}/>
+                <PersonEditForm afterEditAction={this.afterEditAction} id={(this.props.match.params as params).id}/>
             </div>
         );
     }

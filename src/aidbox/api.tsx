@@ -1,5 +1,8 @@
+import moment, {Moment}  from 'moment';
+
 import config from './config.json';
 import {IPerson, Gender} from "../main/Person";
+
 
 interface IHL7Address{
     city: string;
@@ -16,7 +19,7 @@ interface IHL7Name{
 interface IHL7Resource{
     id: string;
     name: IHL7Name[];
-    address: IHL7Address[];
+    //address: IHL7Address[];
     birthDate: string;
     gender: string;
 }
@@ -27,32 +30,34 @@ interface IHL7PatientAnswer{
 }
 
 
-function IHL7ResourceToPerson(resource:IHL7Resource):IPerson{
+function HL7ResourceToPerson(resource:IHL7Resource):IPerson{
     return{
         firstName: resource.name[0].given[0],
         lastName: resource.name[0].family,
         middleName: resource.name[0].given[1]?resource.name[0].given[1]:'',
-        birthDate: new Date(resource.birthDate),
-        address: resource.address[0].line[0],
+        birthDate: moment(resource.birthDate),
+        //address: resource.address[0].line[0],
         id: resource.id,
         gender: resource.gender as Gender
     };
 }
 
-// function PersonToIHL7Resource(patient:IPerson){
-//     let name:IHL7Name ={
-//         family: patient.lastName,
-//         given: [patient.firstName,],
-//
-//     };
-//     return{
-//         name[
-//             given[]
-//         ]
-//     }
-// }
+export function PersonToHL7Resource(patient:IPerson){
+    let name:IHL7Name ={
+        family: patient.lastName,
+        given: patient.middleName?[patient.firstName, patient.middleName]:[patient.firstName],
 
-export let Patients = () => fetch(config.url + 'Patient/',
+
+    };
+    return{
+        id: patient.id,
+        name: [name,],
+        birthDate: patient.birthDate.format('YYYY-MM-DD'),
+        gender: patient.gender
+    }
+}
+
+export let Patients = () => fetch(config.url + 'Patient/?_sort=name',
     {
         method: 'GET',
         headers: {
@@ -65,9 +70,10 @@ export let Patients = () => fetch(config.url + 'Patient/',
         }
         return response.json().then(
             (data)=>{
+                console.log(data);
                 return data.entry.map(
                     (answer:IHL7PatientAnswer)=>{
-                        return IHL7ResourceToPerson(answer.resource);
+                        return HL7ResourceToPerson(answer.resource);
                     }
                 );
             }
@@ -76,9 +82,11 @@ export let Patients = () => fetch(config.url + 'Patient/',
 );
 export let Patient = (id:string) => fetch(config.url + 'Patient/' + id,
     {
-
         method: 'GET',
-        headers: { 'Authorization': config.authorization,},
+        headers: {
+            'Authorization': config.authorization,
+            'cache-control': 'no-cache'
+        },
     }
 ).then(response=> {
         if (!response.ok) {
@@ -86,12 +94,46 @@ export let Patient = (id:string) => fetch(config.url + 'Patient/' + id,
         }
         return response.json().then(
             (data) => {
-                console.log('here is ok');
                 console.log(data);
-                return IHL7ResourceToPerson(data);
+                return HL7ResourceToPerson(data);
             }
         );
     }
-
 );
 
+export let updatePatient = (patient:IPerson) => fetch(config.url + 'Patient/' + patient.id + '?_method=merge-patch',
+    {
+        method: 'PATCH',
+        headers: {
+            'Authorization': config.authorization,
+            'content-type': 'application/merge-patch+json'
+        },
+        body: JSON.stringify(PersonToHL7Resource(patient))
+    }
+
+    ).then(response=>{
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+        return response.json();
+    }
+);
+
+export let createPatient = (patient:IPerson) => fetch(config.url + 'Patient/?_format=json' ,
+    {
+        method: 'POST',
+        headers: {
+            'Authorization': config.authorization,
+            'content-type': 'application/merge-patch+json'
+        },
+        body: JSON.stringify(PersonToHL7Resource(patient))
+    }
+
+).then(response=>{
+        if (!response.ok) {
+            console.log(response);
+            throw new Error(response.statusText);
+        }
+        return response.json();
+    }
+);

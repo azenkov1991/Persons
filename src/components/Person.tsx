@@ -16,7 +16,7 @@ export class Person extends React.Component<IPersonProps,{}>{
                 <Col span={5}><p>{this.props.lastName}</p></Col>
                 <Col span={5}><p>{this.props.middleName}</p></Col>
                 <Col span={5}><p>{this.props.gender}</p></Col>
-                <Col span={5}><p>{this.props.birthDate.toDateString()}</p></Col>
+                <Col span={5}><p>{this.props.birthDate.format('YYYY-MM-DD')}</p></Col>
             </Row>
         )
     }
