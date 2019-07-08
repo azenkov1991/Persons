@@ -5,7 +5,7 @@ import {Icon, Form, Input, DatePicker, Select, Button, message} from "antd";
 
 
 import {IPerson, Gender} from "../main/Person";
-import {Patient, updatePatient, createPatient, PersonToHL7Resource} from "../aidbox/api";
+import {Patient, updatePatient, createPatient, deletePatient, PersonToHL7Resource} from "../aidbox/api";
 
 
 interface  IPersonEditFormState {
@@ -19,6 +19,7 @@ interface  IPersonEditFormState {
 interface IPersonEditFormProps {
     id: string;
     afterEditAction: ()=>void;
+    afterDeleteAction: ()=>void;
 }
 
 export class PersonEditForm extends Component<IPersonEditFormProps, IPersonEditFormState>{
@@ -27,6 +28,16 @@ export class PersonEditForm extends Component<IPersonEditFormProps, IPersonEditF
         wasEdit: false,
         wasSaved: false,
         wasLoaded: false,
+    };
+
+    handleDelete = (event:React.MouseEvent<HTMLButtonElement>)=>{
+        const dP = deletePatient(this.state.person.id);
+        dP.then(data=>{
+                console.log(data);
+                message.success(`Patient ${this.state.person.id} was delete` );
+                this.props.afterDeleteAction();
+            }
+        ).catch((error)=>message.error(error.message))
     };
 
     handleSubmit = (event:React.FormEvent<HTMLFormElement>)=>{
@@ -157,6 +168,9 @@ export class PersonEditForm extends Component<IPersonEditFormProps, IPersonEditF
                         <Button disabled = {!this.state.wasEdit} type="primary" htmlType="submit">
                             Save
                         </Button>
+                        {   (this.props.id!='new')?
+                            <Button type={"danger"} onClick={this.handleDelete}> Delete </Button>:""
+                        }
                     </Form.Item>
                 </Form>
             :

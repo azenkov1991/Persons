@@ -137,3 +137,20 @@ export let createPatient = (patient:IPerson) => fetch(config.url + 'Patient/?_fo
         return response.json();
     }
 );
+
+export let deletePatient = (id: string) => fetch(config.url + 'Patient/' + id,
+    {
+        method: 'DELETE',
+        headers: {
+            'Authorization': config.authorization,
+        },
+    }
+
+).then(response=>{
+        if (!response.ok) {
+            console.log(response);
+            throw new Error(response.statusText);
+        }
+        return response.json();
+    }
+);

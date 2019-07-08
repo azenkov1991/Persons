@@ -11,6 +11,9 @@ export class PersonEditPage extends Component<RouteChildrenProps,{}>{
     afterEditAction =  () =>{
         this.props.history.push('/');
     };
+    afterDeleteAction = (patientID: string) =>{
+        this.props.history.push('/');
+    };
     render(){
         return (
             <div>
@@ -18,7 +21,7 @@ export class PersonEditPage extends Component<RouteChildrenProps,{}>{
                     <Icon type="left" />
                     Go back
                 </Button>
-                <PersonEditForm afterEditAction={this.afterEditAction} id={(this.props.match.params as params).id}/>
+                <PersonEditForm afterDeleteAction={this.afterEditAction} afterEditAction={this.afterEditAction} id={(this.props.match.params as params).id}/>
             </div>
         );
     }
